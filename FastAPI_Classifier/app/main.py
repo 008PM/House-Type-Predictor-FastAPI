@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
 import os
@@ -33,12 +34,42 @@ app = FastAPI(
 )
 
 # -------------------------------
+# Configure CORS for Next.js Frontend
+# -------------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In Produktion: Ihre Next.js Domain eintragen
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# -------------------------------
 # Define input schema
 # -------------------------------
 class RoomFeatures(BaseModel):
     volume_m3: float
     area_m2: float
     total_heating_load_kw: float
+
+# -------------------------------
+# Root endpoint for health check
+# -------------------------------
+@app.get("/")
+def root():
+    """
+    Health check endpoint - verifies API is running
+    """
+    return {
+        "status": "ok",
+        "message": "Room Prediction API is running",
+        "version": "2.0",
+        "endpoints": {
+            "predict_room_type": "/predict",
+            "predict_load": "/predict-load",
+            "docs": "/docs"
+        }
+    }
 
 # -------------------------------
 # 1️⃣ Predict Room Type Endpoint
