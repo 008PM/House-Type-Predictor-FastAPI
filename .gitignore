@@ -52,3 +52,7 @@ htmlcov/
 
 # Misc
 Misc_testing/
+
+# Optional Docker files (not needed with Railpack)
+# Dockerfile
+# .dockerignore

@@ -36,10 +36,19 @@ uvicorn app.main:app --reload
 
 ### Railway Deployment (empfohlen)
 
+Das Projekt verwendet **Railpack** - Railways moderner Zero-Config Builder:
+
 1. Pushen Sie das Projekt zu GitHub
 2. Verbinden Sie Ihr Repository mit [Railway](https://railway.app)
-3. Railway erkennt automatisch die Konfiguration
-4. Nach ~2-5 Minuten ist Ihre API live!
+3. Railpack erkennt automatisch Python und baut Ihre App
+4. Nach ~2-4 Minuten ist Ihre API live!
+
+**Build-Methode**: Railpack (Nachfolger von Nixpacks)
+
+**Vorteile**:
+- ✅ Zero-Config - automatische Erkennung
+- ✅ Schnellere Builds durch besseres Caching
+- ✅ Kleinere Container-Images
 
 **Detaillierte Anleitung**: Siehe [DEPLOYMENT.md](DEPLOYMENT.md)
 
@@ -116,16 +125,16 @@ House-Type-Predictor-FastAPI/
 │   │   ├── main.py             # FastAPI Anwendung
 │   │   └── model/
 │   │       └── room_type_predictor.joblib  # Trainiertes ML-Modell
-│   ├── requirements.txt        # Python Dependencies (alt)
+│   ├── requirements.txt        # Python Dependencies (lokal)
 │   └── ReadMe.md              # API Dokumentation
 ├── Misc_testing/              # Datenanalyse & Notebooks
-├── requirements.txt           # Python Dependencies (für Railway)
-├── Procfile                   # Railway Start-Command
-├── railway.toml              # Railway Konfiguration
-├── .gitignore                # Git Ignore Datei
-├── DEPLOYMENT.md             # Deployment Guide
-├── NEXTJS_EXAMPLE.md         # Frontend Integration
-└── README.md                 # Diese Datei
+├── requirements.txt           # Python Dependencies (Railpack)
+├── Procfile                  # Alternativer Start-Command
+├── railway.toml              # Railway Konfiguration (Railpack)
+├── .gitignore               # Git Ignore Datei
+├── DEPLOYMENT.md            # Deployment Guide
+├── NEXTJS_EXAMPLE.md        # Frontend Integration
+└── README.md                # Diese Datei
 ```
 
 ## 🔒 CORS Konfiguration

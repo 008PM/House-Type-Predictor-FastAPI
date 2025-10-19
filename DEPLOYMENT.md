@@ -17,23 +17,39 @@
 
 Railway erkennt automatisch:
 - Die `railway.toml` Konfiguration
-- Die `requirements.txt` im Root-Verzeichnis für Python-Dependencies
-- Den Start-Command aus der `railway.toml`
+- Die `requirements.txt` für Python-Dependencies
+- **Railpack** analysiert automatisch Ihr Projekt
+
+### Build-Methode: Railpack (Nachfolger von Nixpacks)
+Railpack ist der moderne Zero-Config Builder von Railway mit:
+- ✅ Automatischer Spracherkennung
+- ✅ Besserem Caching und schnelleren Builds
+- ✅ Kleineren Container-Images
+- ✅ Granularer Versionskontrolle
 
 ### Wichtige Einstellungen:
+- **Builder**: Railpack (automatisch)
 - **Root Directory**: `/` (Projekt-Root)
-- **Start Command**: `uvicorn FastAPI_Classifier.app.main:app --host 0.0.0.0 --port $PORT`
 - **Port**: Railway stellt automatisch `$PORT` bereit
-- **Python Version**: Wird automatisch von Nixpacks erkannt
+- **Python Version**: Wird automatisch erkannt
+- **Dependencies**: Aus `requirements.txt` im Root
 
 ## Schritt 3: Deployment starten
 
 1. Railway startet automatisch das Deployment
-2. Warten Sie, bis der Build abgeschlossen ist (~2-5 Minuten)
+2. Railpack analysiert Ihr Projekt und erstellt den Build (~2-4 Minuten)
 3. Nach erfolgreichem Deployment erhalten Sie eine URL wie:
    ```
    https://ihr-projekt.railway.app
    ```
+
+### Railpack aktivieren (falls nötig)
+
+Railpack sollte automatisch verwendet werden. Falls nicht:
+1. Gehen Sie zu Ihrem Railway Projekt
+2. Klicken Sie auf **Settings**
+3. Unter **Builder** wählen Sie **Railpack**
+4. Speichern und neu deployen
 
 ## Schritt 4: API testen
 
@@ -73,15 +89,20 @@ Falls Sie CORS auf spezifische Origins beschränken möchten:
 
 ## Troubleshooting
 
-### Deployment schlägt fehl mit "Nixpacks build failed"
-- ✅ **Gelöst**: `requirements.txt` ist jetzt im Root-Verzeichnis
+### Build schlägt fehl
+- ✅ **Gelöst**: Projekt verwendet jetzt **Railpack** (Nachfolger von Nixpacks)
+- Railpack erkennt Python automatisch über `requirements.txt` im Root
 - Überprüfen Sie die Logs in Railway Dashboard
-- Stellen Sie sicher, dass alle Dependencies in `requirements.txt` sind
 
 ### "Module not found" Fehler
 - ✅ **Gelöst**: `__init__.py` Dateien wurden hinzugefügt
+- Railpack installiert alle Dependencies aus `requirements.txt`
 - Stellen Sie sicher, dass `FastAPI_Classifier/__init__.py` existiert
-- Stellen Sie sicher, dass `FastAPI_Classifier/app/__init__.py` existiert
+
+### Railpack wird nicht verwendet
+- Gehen Sie zu Railway Project Settings
+- Wählen Sie unter "Builder" explizit **Railpack**
+- Triggern Sie ein neues Deployment
 
 ### API nicht erreichbar
 - Überprüfen Sie, ob der Health Check (`/`) funktioniert
