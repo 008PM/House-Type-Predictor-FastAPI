@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "cd FastAPI_Classifier && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+startCommand = "uvicorn FastAPI_Classifier.app.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"

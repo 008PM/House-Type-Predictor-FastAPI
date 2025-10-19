@@ -17,13 +17,14 @@
 
 Railway erkennt automatisch:
 - Die `railway.toml` Konfiguration
-- Die `requirements.txt` für Python-Dependencies
+- Die `requirements.txt` im Root-Verzeichnis für Python-Dependencies
 - Den Start-Command aus der `railway.toml`
 
 ### Wichtige Einstellungen:
 - **Root Directory**: `/` (Projekt-Root)
-- **Start Command**: Wird automatisch aus `railway.toml` übernommen
+- **Start Command**: `uvicorn FastAPI_Classifier.app.main:app --host 0.0.0.0 --port $PORT`
 - **Port**: Railway stellt automatisch `$PORT` bereit
+- **Python Version**: Wird automatisch von Nixpacks erkannt
 
 ## Schritt 3: Deployment starten
 
@@ -72,17 +73,25 @@ Falls Sie CORS auf spezifische Origins beschränken möchten:
 
 ## Troubleshooting
 
-### Deployment schlägt fehl
+### Deployment schlägt fehl mit "Nixpacks build failed"
+- ✅ **Gelöst**: `requirements.txt` ist jetzt im Root-Verzeichnis
 - Überprüfen Sie die Logs in Railway Dashboard
 - Stellen Sie sicher, dass alle Dependencies in `requirements.txt` sind
+
+### "Module not found" Fehler
+- ✅ **Gelöst**: `__init__.py` Dateien wurden hinzugefügt
+- Stellen Sie sicher, dass `FastAPI_Classifier/__init__.py` existiert
+- Stellen Sie sicher, dass `FastAPI_Classifier/app/__init__.py` existiert
 
 ### API nicht erreichbar
 - Überprüfen Sie, ob der Health Check (`/`) funktioniert
 - Prüfen Sie die Railway Logs auf Fehler
+- Warten Sie ~2-3 Minuten nach Deployment
 
 ### CORS-Fehler im Frontend
 - Stellen Sie sicher, dass CORS in `main.py` konfiguriert ist
 - Überprüfen Sie die `allow_origins` Einstellung
+- Testen Sie mit Browser DevTools Console
 
 ## Kosten
 Railway bietet:

@@ -20,10 +20,13 @@ python3 -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # Dependencies installieren
-cd FastAPI_Classifier
 pip install -r requirements.txt
 
-# Server starten
+# Server starten (aus dem Projekt-Root)
+uvicorn FastAPI_Classifier.app.main:app --reload
+
+# ODER: Im FastAPI_Classifier Ordner
+cd FastAPI_Classifier
 uvicorn app.main:app --reload
 ```
 
@@ -107,18 +110,22 @@ curl -X POST https://ihre-api.railway.app/predict \
 ```
 House-Type-Predictor-FastAPI/
 ├── FastAPI_Classifier/
+│   ├── __init__.py             # Python Package Marker
 │   ├── app/
-│   │   ├── main.py              # FastAPI Anwendung
+│   │   ├── __init__.py         # Python Package Marker
+│   │   ├── main.py             # FastAPI Anwendung
 │   │   └── model/
 │   │       └── room_type_predictor.joblib  # Trainiertes ML-Modell
-│   ├── requirements.txt         # Python Dependencies
-│   └── ReadMe.md               # API Dokumentation
-├── Misc_testing/               # Datenanalyse & Notebooks
-├── Procfile                    # Railway Start-Command
-├── railway.toml               # Railway Konfiguration
-├── DEPLOYMENT.md              # Deployment Guide
-├── NEXTJS_EXAMPLE.md          # Frontend Integration
-└── README.md                  # Diese Datei
+│   ├── requirements.txt        # Python Dependencies (alt)
+│   └── ReadMe.md              # API Dokumentation
+├── Misc_testing/              # Datenanalyse & Notebooks
+├── requirements.txt           # Python Dependencies (für Railway)
+├── Procfile                   # Railway Start-Command
+├── railway.toml              # Railway Konfiguration
+├── .gitignore                # Git Ignore Datei
+├── DEPLOYMENT.md             # Deployment Guide
+├── NEXTJS_EXAMPLE.md         # Frontend Integration
+└── README.md                 # Diese Datei
 ```
 
 ## 🔒 CORS Konfiguration
