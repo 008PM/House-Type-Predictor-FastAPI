@@ -143,7 +143,7 @@ GEBÄUDEDATEN:
         """
         try:
             message = self.claude.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5",  # Alias für neueste Sonnet 4.5 Version
                 max_tokens=max_tokens,
                 temperature=0.7,
                 messages=[
