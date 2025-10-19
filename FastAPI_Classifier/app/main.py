@@ -35,7 +35,8 @@ app = FastAPI(
         "AI-powered building planning API with:\n"
         "1️⃣ `/predict` — Predicts Room_Type_No\n"
         "2️⃣ `/predict-load` — Predicts Heating & Cooling loads\n"
-        "3️⃣ `/generate_report` — AI-powered report generation with Claude Sonnet 4.5"
+        "3️⃣ `/generate_report` — AI-powered report generation with Claude Sonnet 4.5\n"
+        "4️⃣ `/estimate-costs` — AI-powered cost estimation (fast, JSON response)"
     ),
     version="2.0"
 )
@@ -65,6 +66,15 @@ class ReportRequest(BaseModel):
     project_type: str
     federal_state: str
 
+class CostEstimationRequest(BaseModel):
+    project_name: str
+    location: str
+    project_type: str
+    federal_state: str
+    total_area_m2: float
+    number_of_rooms: Optional[int] = None
+    building_height_m: Optional[float] = None
+
 # -------------------------------
 # Root endpoint for health check
 # -------------------------------
@@ -82,6 +92,7 @@ def root():
             "predict_room_type": "/predict",
             "predict_load": "/predict-load",
             "generate_report": "/generate_report (AI-powered)",
+            "estimate_costs": "/estimate-costs (AI-powered)",
             "docs": "/docs"
         }
     }
@@ -226,3 +237,154 @@ async def generate_ai_report(
         raise HTTPException(status_code=400, detail="Invalid JSON in request field")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Report generation error: {e}")
+
+# -------------------------------
+# 4️⃣ AI Cost Estimation Endpoint
+# -------------------------------
+@app.post("/estimate-costs", summary="AI-powered Cost Estimation")
+async def estimate_costs(request: CostEstimationRequest):
+    """
+    Generate AI-powered cost estimation for TGA (Technical Building Equipment)
+    
+    🤖 Uses Claude Sonnet 4.5 for intelligent cost calculation
+    
+    Returns detailed cost breakdown by cost groups (KG 410, 420, 430, 440, 470, 480)
+    
+    **Example Request:**
+    ```json
+    {
+        "project_name": "Bürogebäude Muster GmbH",
+        "location": "München, Bayern",
+        "project_type": "office",
+        "federal_state": "Bayern",
+        "total_area_m2": 1500.0,
+        "number_of_rooms": 50,
+        "building_height_m": 12.0
+    }
+    ```
+    """
+    try:
+        print(f"\n{'='*60}")
+        print(f"💰 Starting AI Cost Estimation")
+        print(f"   Project: {request.project_name}")
+        print(f"   Area: {request.total_area_m2} m²")
+        print(f"{'='*60}\n")
+        
+        # Initialize AI generator
+        try:
+            generator = AIReportGenerator(
+                project_name=request.project_name,
+                location=request.location,
+                project_type=request.project_type,
+                federal_state=request.federal_state
+            )
+        except ValueError as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"{str(e)} - Please set ANTHROPIC_API_KEY environment variable"
+            )
+        
+        # Build context for cost estimation
+        context = f"""
+PROJEKT KOSTENSCHÄTZUNG:
+
+Projektname: {request.project_name}
+Standort: {request.location}
+Gebäudetyp: {request.project_type}
+Bundesland: {request.federal_state}
+
+GEBÄUDEDATEN:
+- Gesamtfläche: {request.total_area_m2} m²
+- Anzahl Räume: {request.number_of_rooms or 'nicht angegeben'}
+- Gebäudehöhe: {request.building_height_m or 'nicht angegeben'} m
+"""
+        
+        # AI Prompt für Kostenschätzung
+        prompt = f"""{context}
+
+Erstelle eine detaillierte Kostenschätzung für die Technische Gebäudeausrüstung (TGA) nach DIN 276.
+
+Berechne für jede Kostengruppe:
+
+**KG 410 - Abwasser-, Wasser- und Gasanlagen**
+- Berücksichtige: Sanitärobjekte, Leitungen, Armaturen
+- Richtwert: 80-120 €/m² für {request.project_type}
+
+**KG 420 - Wärmeversorgungsanlagen**
+- Wärmeerzeugung, Verteilung, Übergabe
+- Richtwert: 120-180 €/m² für {request.project_type}
+
+**KG 430 - Lüftungstechnische Anlagen**
+- RLT-Anlagen, Kanäle, Luftauslässe
+- Richtwert: 100-150 €/m² für {request.project_type}
+
+**KG 434 - Kältetechnische Anlagen**
+- Nur wenn erforderlich
+- Richtwert: 60-100 €/m² für {request.project_type}
+
+**KG 440 - Elektroanlagen**
+- Stromversorgung, Beleuchtung, IT
+- Richtwert: 100-140 €/m² für {request.project_type}
+
+**KG 470 - Nutzungsspezifische Anlagen**
+- Feuerlöschanlage, Sonderausstattung
+- Richtwert: 20-40 €/m² für {request.project_type}
+
+**KG 480 - Gebäudeautomation**
+- DDC-System, Regelung, Visualisierung
+- Richtwert: 30-50 €/m² für {request.project_type}
+
+WICHTIG:
+1. Gib für JEDE Kostengruppe einen spezifischen €-Betrag an (nicht nur Richtwerte)
+2. Begründe die Wahl (einfacher/mittlerer/gehobener Standard)
+3. Berücksichtige den Standort {request.federal_state} (Lohnniveau)
+4. Berücksichtige den Gebäudetyp {request.project_type}
+5. Summiere am Ende die Gesamtkosten TGA (KG 400)
+
+Format als JSON:
+{{
+  "kg_410": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "kg_420": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "kg_430": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "kg_434": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "kg_440": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "kg_470": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "kg_480": {{"betrag": 00000, "pro_m2": 000, "beschreibung": "..."}},
+  "gesamt_kg_400": {{"betrag": 00000, "pro_m2": 000}},
+  "genauigkeit": "±30% (Kostenschätzung nach LP2)",
+  "hinweise": ["...", "..."]
+}}
+"""
+        
+        # Call Claude AI
+        print("🤖 Calling Claude Sonnet 4.5 for cost estimation...")
+        response = generator._call_claude(prompt, max_tokens=2000)
+        
+        # Parse JSON response
+        import re
+        
+        # Extract JSON from response (might have markdown code blocks)
+        json_match = re.search(r'\{[\s\S]*\}', response)
+        if json_match:
+            cost_data = json.loads(json_match.group(0))
+        else:
+            cost_data = {"error": "Could not parse AI response", "raw_response": response}
+        
+        print(f"\n{'='*60}")
+        print(f"✅ Cost Estimation Complete!")
+        print(f"   Total: {cost_data.get('gesamt_kg_400', {}).get('betrag', 'N/A')} €")
+        print(f"{'='*60}\n")
+        
+        return {
+            "success": True,
+            "project_name": request.project_name,
+            "total_area_m2": request.total_area_m2,
+            "cost_estimation": cost_data,
+            "generated_by": "Claude Sonnet 4.5",
+            "disclaimer": "Kostenschätzung nach DIN 276, Genauigkeit ±30%, Stand LP2"
+        }
+        
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse AI response as JSON: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cost estimation error: {str(e)}")
