@@ -1,13 +1,9 @@
-# 🐍 Python
-
-
-# 🧠 Virtual Environment
-.venv/
-venv/
-env/c
-ENV/
-
-# 📦 Distribution / packaging
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
 develop-eggs/
 dist/
@@ -20,33 +16,39 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
+*.egg
 
-# 🔍 Logs and temp files
-*.log
-*.tmp
-*.temp
-*.DS_Store
+# Virtual Environment
+.venv
+venv/
+ENV/
+env/
 
-# 🧪 Jupyter / IPython
-.ipynb_checkpoints/
-*.ipynb
-
-# 🧰 IDE / Editor
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# 🚀 FastAPI + Models
-app/__pycache__/
-app/model/__pycache__/
-app/model/*.pkl
-app/model/*.joblib
-app/model/*.sav
-
-# 🧱 System files
-Thumbs.db
+# OS
 .DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Misc
+Misc_testing/
