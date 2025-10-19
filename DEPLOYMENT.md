@@ -75,17 +75,29 @@ curl -X POST https://ihr-projekt.railway.app/predict \
   }'
 ```
 
-## Schritt 5: Umgebungsvariablen (Optional)
+## Schritt 5: Umgebungsvariablen
 
-Falls Sie CORS auf spezifische Origins beschränken möchten:
+### Erforderlich für AI Report Generation:
 
 1. Gehen Sie zu Ihrem Railway Projekt
 2. Klicken Sie auf **"Variables"**
 3. Fügen Sie hinzu:
    ```
-   ALLOWED_ORIGINS=https://ihre-nextjs-app.vercel.app
+   ANTHROPIC_API_KEY=sk-ant-...
    ```
-4. Passen Sie `app/main.py` an, um diese Variable zu nutzen
+   
+**Wo bekomme ich den API Key?**
+- Registrieren Sie sich bei [Anthropic Console](https://console.anthropic.com/)
+- Erstellen Sie einen neuen API Key
+- Fügen Sie ihn als Umgebungsvariable in Railway hinzu
+
+### Optional - CORS einschränken:
+
+Falls Sie CORS auf spezifische Origins beschränken möchten:
+```
+ALLOWED_ORIGINS=https://ihre-nextjs-app.vercel.app
+```
+Dann passen Sie `app/main.py` an, um diese Variable zu nutzen
 
 ## Troubleshooting
 

@@ -80,8 +80,10 @@ console.log(`Raumtyp: ${data.Room_Type_No}`);
 | `/` | GET | Health Check |
 | `/docs` | GET | Swagger UI (API Dokumentation) |
 | `/predict` | POST | Raumtyp Vorhersage |
+| `/predict-load` | POST | Heiz-/Kühllast Vorhersage |
+| `/generate_report` | POST | 🤖 AI-gestützter Report (Claude) |
 
-### Beispiel Request:
+### Beispiel: Raumtyp Vorhersage
 
 ```bash
 curl -X POST https://ihre-api.railway.app/predict \
@@ -93,48 +95,61 @@ curl -X POST https://ihre-api.railway.app/predict \
   }'
 ```
 
-### Beispiel Response:
-
+Response:
 ```json
 {
-  "Room_Type_No": 2,
-  "input": {
-    "volume_m3": 50.5,
-    "area_m2": 25.0,
-    "total_heating_load_kw": 3.5
-  }
+  "Room_Type_No": 2
 }
 ```
 
+### Beispiel: AI Report Generation
+
+```bash
+curl -X POST https://ihre-api.railway.app/generate_report \
+  -F 'request={"project_name":"Bürogebäude Muster","location":"München","project_type":"office","federal_state":"Bayern"}' \
+  -F 'export_format=docx'
+```
+
+Download: Professional DOCX report powered by Claude AI 🤖
+
 ## 🛠 Tech Stack
 
+**Core:**
 - **FastAPI** 0.115.0 - Modernes Web-Framework
 - **Uvicorn** 0.30.6 - ASGI Server
 - **Scikit-learn** 1.5.2 - Machine Learning
 - **Pandas** 2.2.3 - Datenverarbeitung
 - **Joblib** 1.4.2 - Model Serialisierung
 
+**AI & Report Generation:**
+- **Anthropic Claude** 0.40.0 - AI-powered content generation
+- **python-docx** 1.1.2 - DOCX export
+- **openpyxl** 3.1.5 - Excel processing
+
 ## 📁 Projekt-Struktur
 
 ```
 House-Type-Predictor-FastAPI/
 ├── FastAPI_Classifier/
-│   ├── __init__.py             # Python Package Marker
+│   ├── __init__.py                  # Python Package Marker
 │   ├── app/
-│   │   ├── __init__.py         # Python Package Marker
-│   │   ├── main.py             # FastAPI Anwendung
+│   │   ├── __init__.py              # Python Package Marker
+│   │   ├── main.py                  # FastAPI Anwendung
+│   │   ├── ai_report_generator.py   # 🤖 Claude AI Report Generator
 │   │   └── model/
-│   │       └── room_type_predictor.joblib  # Trainiertes ML-Modell
-│   ├── requirements.txt        # Python Dependencies (lokal)
-│   └── ReadMe.md              # API Dokumentation
-├── Misc_testing/              # Datenanalyse & Notebooks
-├── requirements.txt           # Python Dependencies (Railpack)
-├── Procfile                  # Alternativer Start-Command
-├── railway.toml              # Railway Konfiguration (Railpack)
-├── .gitignore               # Git Ignore Datei
-├── DEPLOYMENT.md            # Deployment Guide
-├── NEXTJS_EXAMPLE.md        # Frontend Integration
-└── README.md                # Diese Datei
+│   │       ├── room_type_predictor.joblib
+│   │       └── room_load_predictor.joblib
+│   ├── requirements.txt             # Python Dependencies (lokal)
+│   └── ReadMe.md                   # API Dokumentation
+├── Misc_testing/                   # Datenanalyse & Notebooks
+├── requirements.txt                # Python Dependencies (Railpack)
+├── .env.example                   # Environment variables template
+├── Procfile                       # Alternativer Start-Command
+├── railway.toml                   # Railway Konfiguration (Railpack)
+├── .gitignore                    # Git Ignore Datei
+├── DEPLOYMENT.md                 # Deployment Guide
+├── NEXTJS_EXAMPLE.md             # Frontend Integration
+└── README.md                     # Diese Datei
 ```
 
 ## 🔒 CORS Konfiguration
@@ -161,14 +176,32 @@ Das Modell wurde trainiert auf:
 
 ## 🧪 Testing
 
+### Lokal testen
+
 ```bash
-# API lokal testen
+# Health Check
 curl http://localhost:8000/
 
-# Prediction testen
+# ML Prediction
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"volume_m3": 50.5, "area_m2": 25.0, "total_heating_load_kw": 3.5}'
+
+# AI Report (benötigt ANTHROPIC_API_KEY in .env)
+curl -X POST http://localhost:8000/generate_report \
+  -F 'request={"project_name":"Test","location":"München","project_type":"office","federal_state":"Bayern"}' \
+  -F 'export_format=markdown' \
+  -o report.md
+```
+
+### Environment Setup für AI Features
+
+```bash
+# Kopieren Sie .env.example zu .env
+cp .env.example .env
+
+# Fügen Sie Ihren Anthropic API Key hinzu
+# ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 ## 📝 Lizenz
