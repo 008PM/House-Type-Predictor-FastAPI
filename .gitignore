@@ -4,7 +4,7 @@
 # 🧠 Virtual Environment
 .venv/
 venv/
-env/
+env/c
 ENV/
 
 # 📦 Distribution / packaging
